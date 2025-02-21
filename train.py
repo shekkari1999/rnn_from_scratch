@@ -1,11 +1,8 @@
-from tqdm import tqdm
+import os
 import torch
-import torch.optim as optim
-import torch.nn as nn
-import config
-from data import prepare_data
-from model import CustomRNN
-from logger import log_training, save_model_weights
+
+# Create a directory to store checkpoints
+os.makedirs("checkpoints", exist_ok=True)
 
 def train():
     train_loader, stoi, itos = prepare_data()
@@ -26,7 +23,7 @@ def train():
         total_loss = 0
         progress_bar = tqdm(train_loader, desc=f"🔥 Epoch {epoch+1}/{config.NUM_EPOCHS}", leave=True)
 
-        for Xbatch, ybatch in progress_bar:
+        for Xbatch, ybatch in train_loader:
             Xbatch, ybatch = Xbatch.to(config.DEVICE), ybatch.to(config.DEVICE)
 
             optimizer.zero_grad()
@@ -38,10 +35,13 @@ def train():
             optimizer.step()
 
             total_loss += loss.item()
-            progress_bar.set_postfix(loss=loss.item())
 
-        log_training(epoch, total_loss, train_loader)
-        save_model_weights(model, epoch)
+        # Save checkpoint after each epoch
+        checkpoint_path = f"checkpoints/rnn_epoch_{epoch+1}.pth"
+        torch.save(model.state_dict(), checkpoint_path)
+        print(f"✅ Model saved at {checkpoint_path}")
+
+        print(f'🔥 Epoch {epoch + 1}: Loss {total_loss / len(train_loader):.4f}')
 
 if __name__ == "__main__":
     train()
