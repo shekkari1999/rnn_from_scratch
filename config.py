@@ -6,11 +6,13 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Dataset settings
 MAX_LENGTH = 128
-BATCH_SIZE = 1
+BATCH_SIZE = 32
 MIN_FREQ = 3
 
-# Model settings
+# Model settings (##### can be defined there also)
+
+
 EMBEDDING_DIM = 50  # Glove embedding size
 HIDDEN_DIM = 100  # RNN hidden size
 NUM_EPOCHS = 1
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.001 
