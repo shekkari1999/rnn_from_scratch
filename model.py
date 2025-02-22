@@ -1,13 +1,14 @@
 # model.py
 import torch
 import torch.nn as nn
+import config
 
 class CustomRNN(nn.Module):
     def __init__(self, vocab_emb, hidden_dim):
         super(CustomRNN, self).__init__()
 
         vocab_size, embedding_dim = vocab_emb.shape
-        self.embedding_matrix = vocab_emb.clone().detach()
+        self.embedding_matrix = vocab_emb.clone().detach().to(config.DEVICE)  # 🔥 Move to device
 
         # Define RNN weights
         self.Wxh = nn.Parameter(torch.randn(embedding_dim, hidden_dim) * 0.01)
@@ -18,9 +19,9 @@ class CustomRNN(nn.Module):
 
     def forward(self, X):
         batch_size, seq_length = X.shape
-        batch_embeddings = self.embedding_matrix[X]
+        batch_embeddings = self.embedding_matrix[X]  # Now correctly indexed
 
-        ht = torch.zeros(batch_size, self.Whh.shape[0], device=X.device)
+        ht = torch.zeros(batch_size, self.Whh.shape[0], device=config.DEVICE)
         outputs = []
 
         for t in range(seq_length):

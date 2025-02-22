@@ -1,5 +1,11 @@
-import os
+import os  # ✅ Import this to fix the error
 import torch
+import torch.nn as nn
+import torch.optim as optim
+from tqdm import tqdm
+from data import prepare_data
+from model import CustomRNN
+import config
 
 # Create a directory to store checkpoints
 os.makedirs("checkpoints", exist_ok=True)
@@ -18,12 +24,13 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=config.LEARNING_RATE)
 
-    # Training loop
+    
+
     for epoch in range(config.NUM_EPOCHS):
         total_loss = 0
         progress_bar = tqdm(train_loader, desc=f"🔥 Epoch {epoch+1}/{config.NUM_EPOCHS}", leave=True)
 
-        for Xbatch, ybatch in train_loader:
+        for batch_idx, (Xbatch, ybatch) in enumerate(train_loader):
             Xbatch, ybatch = Xbatch.to(config.DEVICE), ybatch.to(config.DEVICE)
 
             optimizer.zero_grad()
@@ -35,6 +42,12 @@ def train():
             optimizer.step()
 
             total_loss += loss.item()
+
+            # 🔥 Update tqdm progress bar
+            progress_bar.set_postfix(loss=loss.item())  # Show batch loss
+            progress_bar.update(1)  # Update tqdm counter
+
+        progress_bar.close()  # ✅ Ensure tqdm closes properly
 
         # Save checkpoint after each epoch
         checkpoint_path = f"checkpoints/rnn_epoch_{epoch+1}.pth"
